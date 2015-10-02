@@ -7,7 +7,7 @@ run_efficiency.R is used to reproduce the figures that compare the efficiency of
 
 run_splines.R pre-computes the relationship between R0bar (see paper) and the true Sharpe ratio
  
-timeseriesSNR.R loads these relationships and apply them to a timeseries.
+timeseriesSNR.R loads these relationships and applies them to a timeseries.
 
 
 
