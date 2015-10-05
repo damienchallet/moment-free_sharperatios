@@ -1,5 +1,5 @@
 # moment-free_sharperatios
-This repository contains the code related to my work entitled "Moment-free Sharpe ratio estimation with total drawdown durations". All you need to reproduce my results is here.
+This repository contains the code related to my work entitled "Moment-free Sharpe ratio estimation with total drawdown durations" available at http://papers.ssrn.com/sol3/papers.cfm?abstract_id=2603682 . All you need to reproduce my results is here.
 
 In particular: 
 
