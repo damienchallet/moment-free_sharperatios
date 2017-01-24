@@ -1,13 +1,5 @@
 # moment-free_sharperatios
-This repository contains the code related to my work entitled "Moment-free Sharpe ratio estimation with total drawdown durations" available at http://papers.ssrn.com/sol3/papers.cfm?abstract_id=2603682 . All you need to reproduce my results is here.
+This repository contains the code related to my work entitled "Sharper asset ranking with total drawdown durations" available at http://papers.ssrn.com/sol3/papers.cfm?abstract_id=2603682 .
 
-In particular: 
-
-run_efficiency.R is used to reproduce the figures that compare the efficiency of my new estimator
-
-run_splines.R pre-computes the relationship between R0bar (see paper) and the true Sharpe ratio
- 
-timeseriesSNR.R loads these relationships and applies them to a timeseries.
-
-
+The contributions of the whole paper are summarized in the R package sharpeRratio, which gives all the needed tools to reproduce my results.
 
