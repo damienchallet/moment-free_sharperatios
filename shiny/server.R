@@ -3,51 +3,43 @@ library(shiny)
 # server.R
 library(parallel)
 library(quantmod)
-library(ghyp)
+library(sharpeRratio)
 
-N=252
 source("helpers.R")
 
-
+N=252
 
 shinyServer(function(input, output) {
-  dataInput <- reactive({
+  dataInput <-  eventReactive(input$startButton,{
+    if(as.numeric(input$dates[2])-as.numeric(input$dates[1])<N+20){
+      input$dates[1]=input$dates[2]-floor(N*365.25/252)-20  #one needs at least as many points as N
+      
+    }
+    print("Downloading data ...")
     myts=getSymbols(input$symb, src = "yahoo", 
                     from = input$dates[1],
                     to = input$dates[2],
-                    auto.assign = FALSE)
+                    auto.assign = FALSE,)
     #print(head(myts))
-    mySNR=estimateSharpeRatio(diff(log(myts[,6])))
-    
-    SNR0s=unlist(lapply(mySNR,function(x) x$SNR0))
-    SNRs=unlist(lapply(mySNR,function(x) max(-1,min(1,x$SNR))))
-    nus=unlist(lapply(mySNR,function(x) x$nu))
-    R0bars=unlist(lapply(mySNR,function(x) x$R0bar))
-    
-
-    SNRs=xts(SNRs,as.Date(names(SNRs)))*sqrt(252)
-    SNR0s=xts(SNR0s,as.Date(names(SNR0s)))*sqrt(252)
-    nus=xts(nus,as.Date(names(nus)))
-    R0bars=xts(R0bars,as.Date(names(R0bars)))
- 
-    zeroxts=xts(rep(NA,N),seq(start(SNRs)-N,start(SNRs)-1,length=N))
-    SNRs=c(zeroxts,SNRs)
-    SNR0s=c(zeroxts,SNR0s)
-    nus=c(zeroxts,nus)
-    R0bars=c(zeroxts,R0bars)
-    return(list(myts=myts[,6],SNRs=SNRs,SNR0s=SNR0s,nus=nus,R0bars=R0bars))
+    print("Computing ...")
+    price=myts[,6]
+    names(price)="price"
+    returns=    na.omit(diff(log(price)))
+    SNR_DT=estimateSharpeRatio(returns,N=input$Tin)
+    SNR_xts=as.xts(SNR_DT)
+    m=merge(SNR_xts,price,all=TRUE)
+    return(m)
   })
   
   output$plot <- renderPlot({
     myres=dataInput()
-    plot(myres$myts[paste0(start(myres$SNRs),"::",end(myres$SNRs))],main=input$symb,log='y',ylab="Adjusted price")
+    plot(myres$price[paste0(start(myres$SNR),"::",end(myres$SNR))],main=input$symb,log='y',ylab="Adjusted price")
   })
  
   output$plot2 <- renderPlot({
     myres=dataInput()
-    plot(myres$SNR0s,main="Sharpe ratio estimation",ylab="Annualized Sharpe ratio")
-    lines(myres$SNR0s,lwd=3)
-    lines(myres$SNRs,col=2,lwd=3)
+    plot(myres$SNR0,main="Sharpe ratio estimation",ylab="Annualized Sharpe ratio")
+    lines(myres$SNR,col=2,lwd=3)
     legend("topright",legend=c("vanilla estimator","moment-free estimator"),col=1:2,lwd=2)
   })
   

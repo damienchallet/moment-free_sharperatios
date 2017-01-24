@@ -1,32 +1,14 @@
-library(ghyp)
-library(Rcpp)
-sourceCpp("R0bar.cpp")
+library(sharpeRratio)
+library(data.table)
 
 source('mcrollapplr.R')
 options(mc.cores=detectCores())
 
-allsplines=readRDS("allsplines_N252_Navg1000.rds")
-
-
 
 estimateSharpeRatio = function(myts,N=252,numPerm=100){
-  print(paste(start(myts),end(myts)))
+  #print(paste(start(myts),end(myts)))
   mySNR=mcrollapplyr(myts,N,mylapply=mclapply,FUN=function(x){
-    print(rnorm(1))
-    myfit=tryCatch(fit.tuv(x,silent=TRUE,nu=4.5),error=function(e){print(e);return(NA)})
-    nuOrig=coef(myfit)$nu
-    nu=round(10*coef(myfit)$nu)/10
-    nu=min(10,nu)
-    nu=max(2.5,nu)
-    R0bar=R0bar(coredata(x),numPerm = numPerm)
-    if(abs(R0bar)<1){
-      R0bar=0
-    }
-    
-    SNR_raw=allsplines[[as.character(nu)]](abs(R0bar))    #splines have been calibrated for positive SNRs
-    SNR_raw=SNR_raw*  (sign(SNR_raw)>0)                   #if(spline(abs(x)))<0, then set SNR to 0 (this occurs when SNR is very small)     
-    SNR=SNR_raw*sign(R0bar)                               #then apply sign of R0bar 
-    
+    myres=as.data.table(estimateSNR(x))
     mu=mean(x)
     mu3=mean((x-mu)^3)
     mu4=mean((x-mu)^4)
@@ -37,8 +19,14 @@ estimateSharpeRatio = function(myts,N=252,numPerm=100){
     
     SNR0=mean(x)/sd(x)
     SNR0sd=(1+SNR0^2/4*(mu4/sigma4-1)-SNR0*mu3/sigma3)/sqrt(length(x))
-    return(list(nuOrig=nuOrig,nu=nu,SNR=SNR,SNR0=SNR0,SNR0sd=SNR0sd,R0bar=R0bar,N=length(x)))
+    DT=cbind(myres,data.table(SNR0=SNR0,SNR0sd=SNR0sd,N=length(x)))
+    return(DT)
   })
+  mySNR=rbindlist(mySNR)
+  mySNR[,SNR0:=SNR0*sqrt(252)]
+  mySNR[,SNR:=SNR*sqrt(252)]
+  mySNR=cbind(date=tail(index(myts),nrow(mySNR)),mySNR)
+
   return(mySNR)
 }
 
