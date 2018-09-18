@@ -19,7 +19,7 @@ estimateSNR=function(x,numPerm=1000){
     return(NULL)
   }
   
-  myfit=tryCatch(fit.tuv(as.numeric(x),silent=TRUE,nu=6),error=function(e){print(e);return(NA)})
+  myfit=tryCatch(fit.tuv(as.numeric(x) - mean(as.numeric(x),na.rm=TRUE),silent=TRUE,nu=6),error=function(e){print(e);return(NA)})
   
   if(!class(myfit)=="mle.ghyp"){
     list(nu=NA,SNR=NA,R0bar=NA,N=length(x))
