@@ -5,10 +5,10 @@ source('mcrollapplr.R')
 options(mc.cores=detectCores())
 
 
-estimateSharpeRatio = function(myts,N=252,numPerm=100){
+estimateSharpeRatio = function(myts,N=252,numPerm=1000){
   #print(paste(start(myts),end(myts)))
   mySNR=mcrollapplyr(myts,N,mylapply=mclapply,FUN=function(x){
-    myres=as.data.table(estimateSNR(x))
+    myres=as.data.table(t(unlist(estimateSNR(x))))
     mu=mean(x)
     mu3=mean((x-mu)^3)
     mu4=mean((x-mu)^4)
@@ -22,7 +22,7 @@ estimateSharpeRatio = function(myts,N=252,numPerm=100){
     DT=cbind(myres,data.table(SNR0=SNR0,SNR0sd=SNR0sd,N=length(x)))
     return(DT)
   })
-  mySNR=rbindlist(mySNR)
+  mySNR=rbindlist(mySNR,fill = TRUE)
   mySNR[,SNR0:=SNR0*sqrt(252)]
   mySNR[,SNR:=SNR*sqrt(252)]
   mySNR=cbind(date=tail(index(myts),nrow(mySNR)),mySNR)

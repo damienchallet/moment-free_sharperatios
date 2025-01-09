@@ -27,7 +27,9 @@ shinyServer(function(input, output) {
     returns=    na.omit(diff(log(price)))
     SNR_DT=estimateSharpeRatio(returns,N=input$Tin)
     SNR_xts=as.xts(SNR_DT)
+
     m=merge(SNR_xts,price,all=TRUE)
+    m=na.omit(m)
     return(m)
   })
   
@@ -38,9 +40,12 @@ shinyServer(function(input, output) {
  
   output$plot2 <- renderPlot({
     myres=dataInput()
-    plot(myres$SNR0,main="Sharpe ratio estimation",ylab="Annualized Sharpe ratio")
-    lines(myres$SNR,col=2,lwd=3)
-    legend("topright",legend=c("vanilla estimator","moment-free estimator"),col=1:2,lwd=2)
+    plot(myres[,c("SNR0","SNR")],main="Sharpe ratio estimation",ylab="Annualized Sharpe ratio")
+    addLegend("topright", on = 1, 
+              legend.names = c("vanilla estimator","moment-free estimator"), 
+              lty = c(1, 1), lwd = 2,
+              col = c("black", "red"))
+    #legend(legend=c("vanilla estimator","moment-free estimator"),col=1:2,lwd=2)
   })
   
    

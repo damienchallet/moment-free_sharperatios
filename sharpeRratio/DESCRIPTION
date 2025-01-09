@@ -1,12 +1,18 @@
 Package: sharpeRratio
 Type: Package
-Title: Moment-Free Estimation of Sharpe Ratios  
-Version: 1.1
-Date: 2016-09-30
+Title: Moment-Free Estimation of Sharpe Ratios
+Version: 1.4.3
+Date: 2022-07-25
 Author: Damien Challet
 Maintainer: Damien Challet <damien.challet@gmail.com>
-Description: An efficient moment-free estimator of the Sharpe ratio, or signal-to-noise ratio, for heavy-tailed data (see <https://arxiv.org/abs/1505.01333>).
-License: GPL (>= 2)
-Depends: ghyp
+Description: An efficient moment-free estimator of the Sharpe ratio, or signal-to-noise ratio, for heavy-tailed data (see <arXiv:1505.01333>).
+License: GPL
+Depends: R (>= 3.5.0), ghyp, methods
 Imports: Rcpp (>= 0.12.4)
 LinkingTo: Rcpp
+RoxygenNote: 7.2.0
+Encoding: UTF-8
+NeedsCompilation: yes
+Packaged: 2021-02-23 21:48:05 UTC; damien
+Repository: CRAN
+Date/Publication: 2021-02-24 05:30:02 UTC
